@@ -1,0 +1,33 @@
+{% extends "network/layout.html" %}
+
+
+{% block body %}
+<div class="container">
+
+{% if message %} 
+Please <a href="{% url 'login' %}">Login</a> or 
+<a href="{% url 'register' %}">Register</a>
+{% endif %}
+<h1>Posts by users you follow</h1>
+{% for follows in following  %}
+
+{% for post in follows.user.post_set.all  %}
+{% if post.user.profile %}
+<a href="{% url 'profile' post.user.profile.id %}" class="m-0 font-weight-bolder">{{ post.user.username }}</a>
+{% endif %}
+<p class="m-0">{{ post.content }}</p>
+<p class="m-0">{{ post.pub_date }}</p>
+<a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+  </svg>
+</a>
+  {{ post.likes.count }}
+<hr>
+
+
+{% endfor %}
+{% endfor %}
+
+</div>
+    
+{% endblock %}

@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from .models import User
+from .models import User, Profile
 
 # imports 
 from django.views import generic
@@ -77,3 +77,32 @@ def register(request):
     else:
         return render(request, "network/register.html")
     
+def profile(request, id):
+    if request.user.is_authenticated:
+        try:
+            profile = Profile.objects.get(id=id)
+            
+        except (KeyError, Profile.DoesNotExist):
+            return render(request, "network/profile.html", {"error_message":"Error"})
+        else:
+            user_posts = profile.user.post_set.all()
+            following = profile.follows.all()
+        if request.method == 'POST':
+            follow = request.POST.get('follow')
+            if follow == "follow":
+                request.user.profile.follows.add(profile)
+                request.user.profile.save()
+                return HttpResponseRedirect(reverse('profile', args=(id,)))
+            else:
+                request.user.profile.follows.remove(profile)
+                request.user.profile.save()
+                return HttpResponseRedirect(reverse('profile', args=(id,)))
+        return render(request, "network/profile.html", {'profile': profile, 'user_posts': user_posts})
+
+def following(request):
+    if request.user.is_authenticated:
+        following = request.user.profile.follows.all()
+        return render(request, 'network/following.html', {'following': following})
+    else:
+        return render(request, 'network/following.html', {'message': "Please login"})
+        

@@ -1,0 +1,53 @@
+{% extends "network/layout.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block body %}
+<div class="container">
+    {% if profile %}
+        {% if request.user.profile == profile %}
+            <h1 class="text-center mt-3">Welcome to your profile page</h1>
+        {% else %}
+            <h1 class="text-center mt-3">Welcome to {{ profile.user.username }}'s profile page</h1>
+            <form method="POST" class="my-2">
+                {% csrf_token %}
+                <div class="col text-center">
+                {% if profile in request.user.profile.follows.all %}
+                <button class="btn btn-outline-danger btn-lg" type="submit" name="follow" value="unfollow">Unfollow {{ profile.user}}</button>
+                {% else %}
+                <button class="btn btn-outline-success btn-lg" type="submit" name="follow" value="follow">Follow {{ profile.user}}</button>
+                {% endif %}
+                </div>
+            </form>
+        {% endif %}
+        <div class="text-center">
+            <small class="mx-1">Following {{ profile.follows.count }} user{{ profile.follows.count|pluralize}}</small>
+            <small class='mx-1'>Followed by {{ profile.followed_by.count }} user{{ profile.followed_by.count|pluralize }}</small>
+        </div>
+
+        <hr>
+        {% if user_posts %}
+    
+            <p class="h5 my-2">Posts by {{ profile.user.username | capfirst}}</p>
+            {% for post in user_posts %}
+                <p class="m-0 font-weight-bolder">{{ post.user.username }}</p>
+                <p class="m-0">{{ post.content }}</p>
+                <p class="m-0">{{ post.pub_date }}</p>
+                <a href="#" class="m-0">
+                    <svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                    </svg>
+                </a>{{ post.likes.count }}
+                <hr>
+
+                {% endfor %}
+        {% else %}
+            <p class="h5 my-2">{{ profile.user.username|capfirst }} has no posts</p>
+
+        {% endif %}
+
+    {% else %}
+        <h1>Profile Does not exist </h1>
+        <a class="btn btn-primary btn-lg" href="{% url 'login' %}">Login</a> or <a class="btn btn-primary btn-lg" href="{% url 'register' %}">Register</a>
+    {% endif %}
+</div>

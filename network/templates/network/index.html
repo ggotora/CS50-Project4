@@ -19,7 +19,9 @@
         </form> 
         <hr>
         {% for post in posts  %}
-            <p class="m-0 font-weight-bolder">{{ post.user.username }}</p>
+            {% if post.user.profile %}
+            <a href="{% url 'profile' post.user.profile.id %}" class="m-0 font-weight-bolder">{{ post.user.username }}</a>
+            {% endif %}
             <p class="m-0">{{ post.content }}</p>
             <p class="m-0">{{ post.pub_date }}</p>
             <a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
