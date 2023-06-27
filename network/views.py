@@ -6,9 +6,23 @@ from django.urls import reverse
 
 from .models import User
 
+# imports 
+from django.views import generic
+from .models import Post 
+from .forms import PostForm
+
 
 def index(request):
-    return render(request, "network/index.html")
+    form = PostForm()
+    if request.user.is_authenticated:
+        if request.method == "Post":
+            form = PostForm(request.POST)
+            if form.is_valid():
+                instance = form.save(commit=False)
+                instance.user = request.user
+                instance.save()
+                HttpResponseRedirect(reverse('index'))
+    return render(request, "network/index.html", {'form': form })
 
 
 def login_view(request):
@@ -61,3 +75,4 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+    
