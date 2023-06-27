@@ -14,15 +14,16 @@ from .forms import PostForm
 
 def index(request):
     form = PostForm()
-    if request.user.is_authenticated:
-        if request.method == "Post":
-            form = PostForm(request.POST)
-            if form.is_valid():
-                instance = form.save(commit=False)
-                instance.user = request.user
-                instance.save()
-                HttpResponseRedirect(reverse('index'))
-    return render(request, "network/index.html", {'form': form })
+    posts = Post.objects.order_by('-pub_date')
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.save()
+            return HttpResponseRedirect(reverse('index'))
+    return render(request, "network/index.html", {'form': form, 'posts': posts})
+
 
 
 def login_view(request):

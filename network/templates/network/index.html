@@ -1,13 +1,37 @@
 {% extends "network/layout.html" %}
+{% load crispy_forms_tags %}
+
 
 {% block body %}
     <div class="container">
         <form method="POST">
+
             {% csrf_token %}
             <label for="id_content">New Post</label>
-            {{ form }}
+            {{ form|crispy}}
+            {% if request.user.is_authenticated %}
             <button class="btn btn-primary" type="submit">Post</button>
-        </form>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a> OR
+            <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a> To Post
+
+            {% endif %}
+        </form> 
+        <hr>
+        {% for post in posts  %}
+            <p class="m-0 font-weight-bolder">{{ post.user.username }}</p>
+            <p class="m-0">{{ post.content }}</p>
+            <p class="m-0">{{ post.pub_date }}</p>
+            <a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+              </svg>
+            </a>
+              {{ post.likes.count }}
+            <hr>
+            
+
+        {% endfor %}
     </div>
+
     
 {% endblock %}

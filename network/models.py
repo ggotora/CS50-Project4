@@ -13,5 +13,6 @@ class Comment(models.Model):
 class Post(models.Model):
     content = models.TextField(verbose_name='')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True, null=True)
     pub_date = models.DateTimeField(auto_now_add=True)
+    likes = models.ManyToManyField(User, related_name="post_like", blank=True)
