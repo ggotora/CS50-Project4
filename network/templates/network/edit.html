@@ -1,16 +1,48 @@
 {% extends "network/layout.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
 
 {% block body %}
 <div class="container">
     {% if is_owner %}
     <h1>Edit Post</h1>
-    <form method="post" id="edit_form">
+    <form method="POST" id="edit_form">
         {% csrf_token %}
-        {{ form }}
+        {{ form|crispy }}
         <button class="btn btn-primary" type="submit">Save</button>
     </form>
+    <div class="message"></div>
+    <div class="new_post"></div>
+    <div class="action"></div>
+
     {% else %}
     <h1>You can only edit your own posts </h1><a href="{% url 'index' %}">Home</a>
     {% endif %}
 </div>  
+<script>
+    const id = "{{ id }}";
+    const index_url = "{% url 'index' %}";
+    const edit_url = "{% url 'edit' id %}";
+    const form = document.getElementById("edit_form");
+    form.addEventListener('submit', editForm);
+
+function editForm(e){
+    e.preventDefault();
+    fetch(form.action, {
+        method: "POST", 
+        body: new FormData(form)
+    })
+    .then(res => res.json())
+    .then(data => {
+        let msg = ""
+        if(data.message === "updated"){
+            document.getElementById("id_content").innerHTML = "";  
+            document.querySelector('.message').innerHTML = 
+            "<p class='my-4 h5'>Post update sucessfully!!!</p>";
+            document.querySelector('.action').innerHTML = `<a class="my-2 mr-3 text-info" href='/'><i class="fa-solid fa-circle-arrow-left fa-lg"></i> Back To Posts</a> <a href=${id}>Re-Edit Post <i class="fa-solid fa-arrow-rotate-left"></i></a>`;  
+        }
+    })
+}
+</script>
 {% endblock %}

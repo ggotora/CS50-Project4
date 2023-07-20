@@ -5,16 +5,18 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from .models import User, Profile
-
+from django.http import JsonResponse
 # imports 
 from django.core.paginator import Paginator
 from .models import Post 
 from .forms import PostForm
+import json
 
 
 def index(request):
     form = PostForm()
     posts = Post.objects.order_by('-pub_date')
+    preview_list = posts[:5]
     paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
@@ -25,7 +27,7 @@ def index(request):
             instance.user = request.user
             instance.save()
             return HttpResponseRedirect(reverse('index'))
-    return render(request, "network/index.html", {'form': form, 'posts': posts, 'page_obj': page_obj})
+    return render(request, "network/index.html", {'form': form, 'preview_list': preview_list, 'page_obj': page_obj})
 
 
 
@@ -101,6 +103,7 @@ def profile(request, id):
                 request.user.profile.save()
                 return HttpResponseRedirect(reverse('profile', args=(id,)))
         return render(request, "network/profile.html", {'profile': profile, 'user_posts': user_posts})
+    return HttpResponseRedirect(reverse('login'))
 
 def following(request):
     if request.user.is_authenticated:
@@ -108,3 +111,37 @@ def following(request):
         profiles_followed = [_profile for _profile in following]
         return render(request, 'network/following.html', {'profiles_followed':profiles_followed })
     return HttpResponseRedirect(reverse('login'))
+
+def edit(request, id):
+    post = get_object_or_404(Post, id=id)
+    form = PostForm(instance=post)
+    is_owner = post.user == request.user
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+        return JsonResponse({"message": "updated"},safe=False)
+    return render(request, "network/edit.html", {
+        'form': form, 
+        'is_owner': is_owner, 
+        'id':id
+
+    })
+
+def like(request):
+    data = json.loads(request.body)
+    id = data["id"]
+    post = get_object_or_404(Post, id=id)
+    liked = ''
+    if request.user.is_authenticated: 
+        if post.likes.filter(id=request.user.id).exists():
+            liked = "No"
+            post.likes.remove(request.user)
+        else:
+            liked = "Yes"
+            post.likes.add(request.user)
+    new_data = {
+             "liked": liked, 
+            "count": post.likes.count()
+        }
+    return JsonResponse(new_data, safe=False)

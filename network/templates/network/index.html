@@ -17,11 +17,15 @@
             <hr>
             {% for post in page_obj  %}
                 <a href="{% url 'profile' post.user.profile.id %}" class="my-1 font-weight-bold text-secondary">{{post.user | capfirst }}</a>
-                <a class="d-block" href="#">Edit</a>
+                {% if post.user == request.user %}<a class="d-block" href="{% url 'edit' post.id %}">Edit</a>{% endif %}
                 <p class="my-0">{{ post.content|truncatechars:100 }} {% if post.content.count > 100 %}...{% endif %}</p>
                 <p class="my-0 text-muted small">{{post.pub_date}}</p>
-                {% if request.user in post.likes.all %}<h1>in</h1>{% else %}Not {% endif %}<i class="fa-solid fa-heart" style="color: #ff0000;"></i>
-                <span>{{ post.likes.count }}</span>
+                {% if request.user in post.likes.all %}
+                    <i value="{{ post.id }}" id="heart" class="fa-solid fa-heart" style="color:#ff0000"></i>
+                {% else %}
+                    <i value="{{ post.id }}" id="heart" class="fa-regular fa-heart" style="color:#ff0000"></i>
+                {% endif %}
+            <span id="count">{{post.likes.count}}</span>
                 <p class="my-0">Comment</p>
                 <hr>
             {% endfor %}
@@ -50,38 +54,101 @@
         </div>
         <hr>
         <h1>Posts Preview</h1>
+        {% for post in preview_list %}
+                <a href="{% url 'profile' post.user.profile.id %}" class="my-1 font-weight-bold text-secondary">{{post.user | capfirst }}</a>
+                <a class="d-block"><s>Edit</s></a>
+                <p class="my-0">{{ post.content|truncatechars:100 }} {% if post.content.count > 100 %}...{% endif %}</p>
+                <p class="my-0 text-muted small">{{post.pub_date}}</p>
+                <p class="my-0">Comment</p>
+                <hr>
+            {% endfor %}
+
         {% endif %}
     </div>
+    <script>
+        const edit = document.querySelectorAll("#edit")
+        const likeBtn = document.querySelectorAll("#heart")
+        const count = document.querySelectorAll("#count")
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+
+        for (let i = 0; i < likeBtn.length; i++){
+            likeBtn[i].addEventListener('click', (e)=> {
+                e.preventDefault();
+                const post_id = likeBtn[i].getAttribute("value")
+                let data = { id: post_id}
+                fetch("/like", {
+                    method: "POST", 
+                    body: JSON.stringify(data), 
+                    headers: {
+                        "Content-Type": "application/json",
+                        'X-CSRFToken': csrftoken
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.liked === "Yes"){
+                        likeBtn[i].classList.remove("fa-regular")
+                        likeBtn[i].classList.add("fa-solid")
+                        count[i].innerText = data.count
+                    }else if(data.liked === "No"){
+                        likeBtn[i].classList.remove("fa-solid")
+                        likeBtn[i].classList.add("fa-regular")
+                        count[i].innerText = data.count
+
+                    }else{
+                        alert("Please login to like post")
+                    }
+                })
+            })
+
+           /* likeBtn[i].addEventListener('click', (e) => {
+                e.preventDefault()
+                let post_id = likeBtn[i].getAttribute("value")
+                let data = { id: post_id}
+                fetch("/like", {
+                    method: "POST", 
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json', 
+                        'X-CSRFToken': csrftoken
+                    } 
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.liked == "Yes"){
+                    likeBtn[i].classList.remove("fa-regular")
+                    likeBtn[i].classList.add("fa-solid")
+                    count[i].innerText = data.count
+                    }else if (data.liked == "No"){
+                        likeBtn[i].classList.remove("fa-solid")
+                    likeBtn[i].classList.add("fa-regular")
+                    count[i].innerText = data.count
+                    }else {
+                    alert("Please Log in to like post")
+
+                    }
+                })
+            }) */
+        }
+
+    </script>
     
 {% endblock %}
-{% comment %} <div class="container">
-    <form method="POST">
 
-        {% csrf_token %}
-        <label for="id_content">New Post</label>
-        {{ form|crispy}}
-        {% if request.user.is_authenticated %}
-        <button class="btn btn-primary" type="submit">Post</button>
-        {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a> OR
-        <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a> To Post
-
-        {% endif %}
-    </form> 
-    <hr>
-    {% for post in posts  %}
-        {% if post.user.profile %}
-        <a href="{% url 'profile' post.user.profile.id %}" class="m-0 font-weight-bolder">{{ post.user.username }}</a>
-        {% endif %}
-        <p class="m-0">{{ post.content }}</p>
-        <p class="m-0">{{ post.pub_date }}</p>
-        <a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-          </svg>
-        </a>
-          {{ post.likes.count }}
-        <hr>
-        
-
-    {% endfor %}
-</div> {% endcomment %}
