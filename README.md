@@ -40,7 +40,7 @@ Using Python, JavaScript, HTML, and CSS, complete the implementation of a social
 - CSS3
 ## YouTube Demo
 
-[Video_Link](https://www.youtube.com/watch?v=FvZ_NFwxz4M)
+[Video_Link](https://www.youtube.com/watch?v=K4dIeBbyRIc)
 
 ## Author
 
@@ -52,7 +52,7 @@ Using Python, JavaScript, HTML, and CSS, complete the implementation of a social
 
 Contributions, issues and feature requests are welcome!
 
-Feel free to check the [issues page](https://github.com/ggotora/CS50_Project3_Mail/issues/1).
+Feel free to check the [issues page](https://github.com/ggotora/CS50-Project4/issues/1).
 
 ## Show your support
 
