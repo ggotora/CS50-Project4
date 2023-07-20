@@ -15,7 +15,7 @@
                 <button class="btn btn-primary" type="submit">Post</button>
             </form>
             <hr>
-            {% for post in posts  %}
+            {% for post in page_obj  %}
                 <a href="{% url 'profile' post.user.profile.id %}" class="my-1 font-weight-bold text-secondary">{{post.user | capfirst }}</a>
                 <a class="d-block" href="#">Edit</a>
                 <p class="my-0">{{ post.content|truncatechars:100 }} {% if post.content.count > 100 %}...{% endif %}</p>
@@ -25,6 +25,23 @@
                 <p class="my-0">Comment</p>
                 <hr>
             {% endfor %}
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+            
+                    <span class="current">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+            
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                    </span>
+            </div>
 
         {% else %}
         <div class="card bg-light h3 my-4 p-4 text-center">

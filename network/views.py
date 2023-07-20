@@ -7,7 +7,7 @@ from django.urls import reverse
 from .models import User, Profile
 
 # imports 
-from django.views import generic
+from django.core.paginator import Paginator
 from .models import Post 
 from .forms import PostForm
 
@@ -15,6 +15,9 @@ from .forms import PostForm
 def index(request):
     form = PostForm()
     posts = Post.objects.order_by('-pub_date')
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
@@ -22,7 +25,7 @@ def index(request):
             instance.user = request.user
             instance.save()
             return HttpResponseRedirect(reverse('index'))
-    return render(request, "network/index.html", {'form': form, 'posts': posts})
+    return render(request, "network/index.html", {'form': form, 'posts': posts, 'page_obj': page_obj})
 
 
 
