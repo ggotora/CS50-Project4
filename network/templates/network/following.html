@@ -1,33 +1,23 @@
 {% extends "network/layout.html" %}
 
-
 {% block body %}
-<div class="container">
+  <div class="container">
+      <h1 class="h3">All Posts</h1>
+      {% for user in following  %}
+          {% for post in user.posts.all %}
+              <a href="{% url 'profile' post.author.id %}" class="d-block h5 text-secondary">{{ post.author.user.username }}</a>
+              <a id="edit" class="d-block" href="{% url 'edit' post.id %}">Edit</a>
+              <p class="my-0">{{ post.content }}</p>
+              <p class="my-0 small text-muted">{{ post.created }}</p>
+              {% if request.user.profile in post.likes.all %}
+                  <i value="{{ post.id }}" id="heart" class="fa-solid fa-heart" style="color:#ff0000"></i>
+              {% else %}
+                  <i value="{{ post.id }}" id="heart" class="fa-regular fa-heart" style="color:#ff0000"></i>
+              {% endif %}
+              <span id="count">{{post.likes.count}}</span>
+              <hr class="mb-1">
+          {% endfor %}
 
-{% if message %} 
-Please <a href="{% url 'login' %}">Login</a> or 
-<a href="{% url 'register' %}">Register</a>
-{% endif %}
-<h1>Posts by users you follow</h1>
-{% for follows in following  %}
-
-{% for post in follows.user.post_set.all  %}
-{% if post.user.profile %}
-<a href="{% url 'profile' post.user.profile.id %}" class="m-0 font-weight-bolder">{{ post.user.username }}</a>
-{% endif %}
-<p class="m-0">{{ post.content }}</p>
-<p class="m-0">{{ post.pub_date }}</p>
-<a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
-    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-  </svg>
-</a>
-  {{ post.likes.count }}
-<hr>
-
-
-{% endfor %}
-{% endfor %}
-
-</div>
-    
+      {% endfor %}
+  </div>
 {% endblock %}

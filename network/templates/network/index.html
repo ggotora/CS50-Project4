@@ -1,39 +1,72 @@
 {% extends "network/layout.html" %}
+{% load static %}
+
 {% load crispy_forms_tags %}
 
 
 {% block body %}
     <div class="container">
-        <form method="POST">
-
-            {% csrf_token %}
-            <label for="id_content">New Post</label>
-            {{ form|crispy}}
-            {% if request.user.is_authenticated %}
-            <button class="btn btn-primary" type="submit">Post</button>
-            {% else %}
-            <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a> OR
-            <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a> To Post
-
-            {% endif %}
-        </form> 
-        <hr>
-        {% for post in posts  %}
-            {% if post.user.profile %}
-            <a href="{% url 'profile' post.user.profile.id %}" class="m-0 font-weight-bolder">{{ post.user.username }}</a>
-            {% endif %}
-            <p class="m-0">{{ post.content }}</p>
-            <p class="m-0">{{ post.pub_date }}</p>
-            <a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-              </svg>
-            </a>
-              {{ post.likes.count }}
+        {% if request.user.is_authenticated %}
+            <h1 class="fw_400">All Posts</h1>
+            <p class="h3 fw_400">New Post</p>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button class="btn btn-primary" type="submit">Post</button>
+            </form>
             <hr>
-            
+            {% for post in posts  %}
+{% load static %}
+{% load static %}
+                <a href="#" class="my-1 font-weight-bold text-secondary">{{post.user | capfirst }}</a>
+                <a class="d-block" href="#">Edit</a>
+                <p class="my-0">{{ post.content|truncatechars:100 }} {% if post.content.count > 100 %}...{% endif %}</p>
+                <p class="my-0 text-muted small">{{post.pub_date}}</p>
+                <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
+                <span>{{ post.likes.count }}</span>
+                <p class="my-0">Comment</p>
+                <hr>
+            {% endfor %}
 
-        {% endfor %}
+        {% else %}
+        <div class="card bg-light h3 my-4 p-4 text-center">
+            <p>Please <a href="{% url 'login' %}"><i class="fa-solid fa-circle-down fa-rotate-270"></i> login</a> or <a href="{% url 'register' %}">register</a> to make and edit posts</p>
+            <p class="h5 text-muted">Enjoy these and many more posts</p>
+        </div>
+        <hr>
+        <h1>Posts Preview</h1>
+        {% endif %}
     </div>
-
     
 {% endblock %}
+<div class="container">
+    <form method="POST">
+
+        {% csrf_token %}
+        <label for="id_content">New Post</label>
+        {{ form|crispy}}
+        {% if request.user.is_authenticated %}
+        <button class="btn btn-primary" type="submit">Post</button>
+        {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-primary">Login</a> OR
+        <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a> To Post
+
+        {% endif %}
+    </form> 
+    <hr>
+    {% for post in posts  %}
+        {% if post.user.profile %}
+        <a href="{% url 'profile' post.user.profile.id %}" class="m-0 font-weight-bolder">{{ post.user.username }}</a>
+        {% endif %}
+        <p class="m-0">{{ post.content }}</p>
+        <p class="m-0">{{ post.pub_date }}</p>
+        <a href="#" class="m-0"><svg  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+          </svg>
+        </a>
+          {{ post.likes.count }}
+        <hr>
+        
+
+    {% endfor %}
+</div>
