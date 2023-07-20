@@ -1,0 +1,16 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div class="container">
+    {% if is_owner %}
+    <h1>Edit Post</h1>
+    <form method="post" id="edit_form">
+        {% csrf_token %}
+        {{ form }}
+        <button class="btn btn-primary" type="submit">Save</button>
+    </form>
+    {% else %}
+    <h1>You can only edit your own posts </h1><a href="{% url 'index' %}">Home</a>
+    {% endif %}
+</div>  
+{% endblock %}
