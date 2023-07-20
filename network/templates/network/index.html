@@ -16,13 +16,11 @@
             </form>
             <hr>
             {% for post in posts  %}
-{% load static %}
-{% load static %}
-                <a href="#" class="my-1 font-weight-bold text-secondary">{{post.user | capfirst }}</a>
+                <a href="{% url 'profile' post.user.profile.id %}" class="my-1 font-weight-bold text-secondary">{{post.user | capfirst }}</a>
                 <a class="d-block" href="#">Edit</a>
                 <p class="my-0">{{ post.content|truncatechars:100 }} {% if post.content.count > 100 %}...{% endif %}</p>
                 <p class="my-0 text-muted small">{{post.pub_date}}</p>
-                <i class="fa-solid fa-heart" style="color: #ff0000;"></i>
+                {% if request.user in post.likes.all %}<h1>in</h1>{% else %}Not {% endif %}<i class="fa-solid fa-heart" style="color: #ff0000;"></i>
                 <span>{{ post.likes.count }}</span>
                 <p class="my-0">Comment</p>
                 <hr>
@@ -39,7 +37,7 @@
     </div>
     
 {% endblock %}
-<div class="container">
+{% comment %} <div class="container">
     <form method="POST">
 
         {% csrf_token %}
@@ -69,4 +67,4 @@
         
 
     {% endfor %}
-</div>
+</div> {% endcomment %}

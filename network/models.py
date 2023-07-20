@@ -32,5 +32,9 @@ class Post(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name="post_like", blank=True)
 
+    class Meta:
+        ordering = ["-pub_date"]
+
     def __str__(self) -> str:
         return f"{self.content[:15]} ..."
+    

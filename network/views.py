@@ -102,7 +102,6 @@ def profile(request, id):
 def following(request):
     if request.user.is_authenticated:
         following = request.user.profile.follows.all()
-        return render(request, 'network/following.html', {'following': following})
-    else:
-        return render(request, 'network/following.html', {'message': "Please login"})
-        
+        profiles_followed = [_profile for _profile in following]
+        return render(request, 'network/following.html', {'profiles_followed':profiles_followed })
+    return HttpResponseRedirect(reverse('login'))
