@@ -118,35 +118,7 @@
                 })
             })
 
-           /* likeBtn[i].addEventListener('click', (e) => {
-                e.preventDefault()
-                let post_id = likeBtn[i].getAttribute("value")
-                let data = { id: post_id}
-                fetch("/like", {
-                    method: "POST", 
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json', 
-                        'X-CSRFToken': csrftoken
-                    } 
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.liked == "Yes"){
-                    likeBtn[i].classList.remove("fa-regular")
-                    likeBtn[i].classList.add("fa-solid")
-                    count[i].innerText = data.count
-                    }else if (data.liked == "No"){
-                        likeBtn[i].classList.remove("fa-solid")
-                    likeBtn[i].classList.add("fa-regular")
-                    count[i].innerText = data.count
-                    }else {
-                    alert("Please Log in to like post")
-
-                    }
-                })
-            }) */
-        }
+                  }
 
     </script>
     
